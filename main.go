@@ -19,8 +19,11 @@ func main () {
 		toto.ProcessDraws(options.draws)
 	}
 	if options.print_draws {
-		fmt.Print("draws")
 		toto.Print()
+	}
+	if options.freq {
+		toto.FreqAnalysis()
+		os.Exit(0)
 	}
 }
 

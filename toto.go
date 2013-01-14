@@ -10,7 +10,7 @@ import (
 	"sort"
 )
 
-type Combination [DRAW_NUMBERS]int8
+type Combination []int8
 
 type Draw struct {
 	number int8
@@ -75,7 +75,7 @@ func getCombination (numbers string) Combination {
 	}
 	// store last number to easy get duplicates
 	last_number := int64(-1);
-	for i, snumber := range anumbers {
+	for _, snumber := range anumbers {
 		inumber, e := strconv.ParseInt(snumber, 10, 8)
 		if e != nil {
 			fmt.Printf("ERROR: Wrong number: %s\n", snumber)
@@ -90,8 +90,9 @@ func getCombination (numbers string) Combination {
 			os.Exit(ERR_DUPLICATE_NUMBER)
 		}
 		last_number = inumber
-		c[i] = int8(inumber)
+		c = append(c, int8(inumber))
 	}
+	sort.Sort(c)
 	return c
 }
 
@@ -106,12 +107,37 @@ func (d *Draw) Print () {
 	fmt.Print("\t")
 	for _, draw := range d.draws {
 		for i, number := range draw {
-			fmt.Print(strconv.Itoa(int(number)))
+			fmt.Printf("%2s", strconv.Itoa(int(number)))
 			if i < 5 {
-				fmt.Print(",")
+				fmt.Print(", ")
 			}
 		}
 		fmt.Print("\t\t")
 	}
 	fmt.Print("\n")
+}
+
+func (c Combination) Len() int           { return len(c) }
+func (c Combination) Less(i, j int) bool { return c[i] < c[j] }
+func (c Combination) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
+
+func (t *Toto) FreqAnalysis() {
+	var freq [MAX_NUMBER]int8
+	var max int8 = 0;
+	for _, draw := range t.draws {
+		for _, sdraw := range draw.draws {
+			for _, number := range sdraw {
+				freq[number-1]++
+				if freq[number-1] > max {
+					max = freq[number-1]
+				}
+			}
+		}
+	}
+	//Print
+	for i, sum := range freq {
+		fmt.Printf("%2d:\t%d |", i+1, sum)
+		fmt.Print(strings.Repeat("=", int(68/int(max)*int(sum))));
+		fmt.Println(">")
+	}
 }
