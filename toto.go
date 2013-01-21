@@ -10,11 +10,12 @@ import (
 	"sort"
 )
 
-type Combination []int8
+type Combination []int
 
 type Draw struct {
-	number int8
+	number int
 	draws [2]Combination
+	max_hits [2]int
 }
 
 type Toto struct {
@@ -28,6 +29,20 @@ func NewToto() *Toto {
 
 func (t *Toto) ProcessNumbers(numbers string) {
 	t.numbers = getCombination(numbers)
+	t.checkNumbers();
+}
+
+func (t *Toto) checkNumbers() {
+	for i, draw := range t.draws {
+		for j, sdraw := range draw.draws {
+			for _, num := range t.numbers {
+				n := sort.SearchInts(sdraw, num) 
+				if n < len(sdraw) && sdraw[n] == num {
+					t.draws[i].max_hits[j]++
+				}
+			}
+		}
+	}
 }
 
 func (t *Toto) ProcessDraws (file_name string) {
@@ -51,7 +66,7 @@ func (t *Toto) ProcessDraws (file_name string) {
 		var draw Draw
 		sdraw_num := line[0:dash_ndx]
 		idraw_num, _ := strconv.ParseInt(sdraw_num, 10, 8)
-		draw.number = int8(idraw_num)
+		draw.number = int(idraw_num)
 		draw_separator :=  strings.Index(line, "\t\t")
 		draw.draws[0] = getCombination(line[dash_ndx+1:draw_separator])
 		draw.draws[1] = getCombination(line[draw_separator:])
@@ -90,7 +105,7 @@ func getCombination (numbers string) Combination {
 			os.Exit(ERR_DUPLICATE_NUMBER)
 		}
 		last_number = inumber
-		c = append(c, int8(inumber))
+		c = append(c, int(inumber))
 	}
 	sort.Sort(c)
 	return c
@@ -105,11 +120,13 @@ func (t *Toto) Print () {
 func (d *Draw) Print () {
 	fmt.Print(d.number)
 	fmt.Print("\t")
-	for _, draw := range d.draws {
-		for i, number := range draw {
+	for i, draw := range d.draws {
+		for j, number := range draw {
 			fmt.Printf("%2s", strconv.Itoa(int(number)))
-			if i < 5 {
+			if j < 5 {
 				fmt.Print(", ")
+			} else {
+				fmt.Printf(" [%d]", d.max_hits[i])
 			}
 		}
 		fmt.Print("\t\t")

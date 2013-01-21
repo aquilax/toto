@@ -12,11 +12,11 @@ var options Options
 func main () {
 	processFlags()
 	toto := NewToto()
-	if options.numbers != "" {
-		toto.ProcessNumbers(options.numbers)
-	}
 	if options.draws != "" {
 		toto.ProcessDraws(options.draws)
+	}
+	if options.numbers != "" {
+		toto.ProcessNumbers(options.numbers)
 	}
 	if options.print_draws {
 		toto.Print()
