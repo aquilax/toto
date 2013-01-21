@@ -11,6 +11,7 @@ import (
 )
 
 type Combination []int
+type Totals [3][DRAW_NUMBERS+1]int
 
 type Draw struct {
 	number int
@@ -112,12 +113,22 @@ func getCombination (numbers string) Combination {
 }
 
 func (t *Toto) Print () {
+	var totals Totals
 	for _, draw := range t.draws {
-		draw.Print()
+		draw.Print(&totals)
+	}
+	fmt.Println("Total:")
+	for i:=0; i <= DRAW_NUMBERS; i++ {
+		first := totals[0][i]
+		second := 0
+		if (i == 6) {
+			second = totals[1][i]
+		}
+		fmt.Printf("\t%d\t[%d]\t[%d]\n", i, first, second)
 	}
 }
 
-func (d *Draw) Print () {
+func (d *Draw) Print (totals *Totals) {
 	fmt.Print(d.number)
 	fmt.Print("\t")
 	for i, draw := range d.draws {
@@ -127,6 +138,7 @@ func (d *Draw) Print () {
 				fmt.Print(", ")
 			} else {
 				fmt.Printf(" [%d]", d.max_hits[i])
+				totals[i][d.max_hits[i]]++
 			}
 		}
 		fmt.Print("\t\t")
